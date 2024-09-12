@@ -44,7 +44,7 @@ public class QuestionController {
     @PostMapping()
     public ResponseEntity<Object> createQuestion(@RequestBody QuestionRequest request) {
         try {
-            // validations
+
             if (request.getStatement() == null || request.getStatement().trim().isEmpty()) {
                 return ResponseEntity.status(400).body(new ErrorMessage("Statement cannot be empty"));
             }
@@ -56,12 +56,12 @@ public class QuestionController {
             if (request.getAlternatives().isEmpty()) {
                 return ResponseEntity.status(400).body(new ErrorMessage("Alternatives cannot be empty"));
             }
-            // check if theme exists
+
             ThemeModel theme = themeService.getThemeId(request.getThemeId());
             if (theme == null) {
                 return ResponseEntity.status(404).body(new ErrorMessage("Theme not found"));
             }
-            // check if there is at least one correct alternative
+
             int countIsCorrect = 0;
             for (AlternativeRequest alternative : request.getAlternatives()) {
                 if (alternative.getDescription().trim().isEmpty()) {
@@ -73,16 +73,14 @@ public class QuestionController {
                     countIsCorrect++;
                 }
             }
-            // count is correct must be at least 1
+
             if (countIsCorrect == request.getAlternatives().size()) {
                 return ResponseEntity.status(400)
                         .body(new ErrorMessage("There must be at least one correct alternative"));
             }
 
-            // create question in database
             QuestionModel createdQuestion = this.questionService.createQuestion(theme, request.getStatement());
 
-            // create alternatives in database
             for (AlternativeRequest alternative : request.getAlternatives()) {
                 alternativeService.createAlternative(createdQuestion, alternative.getDescription(),
                         alternative.getIsCorrect());
@@ -99,20 +97,19 @@ public class QuestionController {
             if (id == null) {
                 return ResponseEntity.status(400).body(new ErrorMessage("obrigatory question"));
             }
-            // check if question exists
+
             QuestionModel question = questionService.getQuestion(id);
 
             if (question == null) {
                 return ResponseEntity.status(404).body(new ErrorMessage("Question not found"));
             }
-            // get alternatives from database and map to dto structure
+
             List<AlternativeStructore> alternativesStructores = question.getAlternatives().stream()
                     .map(alternative -> {
                         return new AlternativeStructore(alternative.getId(),
                                 alternative.getDescription(), alternative.getQuestion().getId());
                     }).toList();
 
-            // create dto structure and return response
             QuestionStructure questionStructure = new QuestionStructure(
                     question.getId(), question.getStatement(), question.getTheme().getId(), alternativesStructores);
 
@@ -126,7 +123,7 @@ public class QuestionController {
     public ResponseEntity<Object> updateQuestion(@PathVariable Long id, @RequestBody QuestionRequestUpdate request) {
 
         try {
-            // validations
+
             if (request.getStatement() == null || request.getStatement().trim().isEmpty()) {
                 return ResponseEntity.status(400).body(new ErrorMessage("Statement cannot be empty"));
             }
@@ -140,7 +137,6 @@ public class QuestionController {
                 return ResponseEntity.status(404).body(new ErrorMessage("Question not found"));
             }
 
-            // check if there is at least one correct alternative
             List<AlternativesModel> saveValidAlternative = new ArrayList<>();
             int countIsCorrect = 0;
 
@@ -167,7 +163,7 @@ public class QuestionController {
                     countIsCorrect++;
                 }
             }
-            // count is correct must be at least 1
+
             if (countIsCorrect == request.getAlternatives().size()) {
                 return ResponseEntity.status(400)
                         .body(new ErrorMessage("There must be at least one correct alternative"));

@@ -102,9 +102,9 @@ public class QuizController {
     @GetMapping("/{themeId}")
     public ResponseEntity<Object> getAllQuestionsByThemeId(@PathVariable Long themeId) {
         try {
-            // get all questions by theme id
+
             List<QuestionModel> questions = questionService.allQuestions(themeId);
-            // map to dto structure and return response
+
             List<QuestionStructure> questionsStructure = questions.stream()
                     .map(question -> {
                         List<AlternativeStructore> alternativesStructores = question.getAlternatives().stream()

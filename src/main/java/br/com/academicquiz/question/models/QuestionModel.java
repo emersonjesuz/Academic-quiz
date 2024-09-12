@@ -29,7 +29,6 @@ public class QuestionModel {
     @Column()
     private String statement;
 
-    // many questions to one theme
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_id", nullable = false)
     @JsonBackReference
